@@ -1,3 +1,4 @@
+
 import os
 import cv2
 import numpy as np
@@ -9,14 +10,14 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras import layers, models
 
 
-DATA_PATH = 'gesture_data/leapGestRecog'
+DATA_PATH = 'gesture_data/00'
 IMG_SIZE = 120
 
-# Load all gesture folders
+
 gesture_folders = sorted(os.listdir(DATA_PATH))
 label_map = {name: idx for idx, name in enumerate(gesture_folders)}
 
-# Load images
+
 data = []
 labels = []
 
@@ -31,13 +32,12 @@ for gesture in gesture_folders:
         data.append(img)
         labels.append(label_map[gesture])
 
-# Convert to numpy arrays
+
 data = np.array(data, dtype="float32") / 255.0
 data = np.expand_dims(data, -1)
 labels = np.array(labels)
 labels = to_categorical(labels, num_classes=len(label_map))
 
-# Train-test split
 X_train, X_test, y_train, y_test = train_test_split(
     data, labels, test_size=0.2, random_state=42, stratify=labels
 )
@@ -71,17 +71,15 @@ history = model.fit(
 loss, acc = model.evaluate(X_test, y_test)
 print(f"\n✅ Test Accuracy: {acc*100:.2f}%")
 
-# Classification report
 y_pred = model.predict(X_test).argmax(axis=1)
 y_true = y_test.argmax(axis=1)
 print("\n📊 Classification Report:")
 print(classification_report(y_true, y_pred, target_names=gesture_folders))
 
-# Confusion matrix
+
 print("📌 Confusion Matrix:")
 print(confusion_matrix(y_true, y_pred))
 
-# Accuracy curve
 plt.plot(history.history['accuracy'], label='Train')
 plt.plot(history.history['val_accuracy'], label='Val')
 plt.title('Accuracy over Epochs')
